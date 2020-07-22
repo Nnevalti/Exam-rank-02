@@ -42,6 +42,7 @@ int			ft_strchr(char *str, char c)
 	return (0);
 
 }
+
 int			ft_atoi(const char *str)
 {
 	int		i;
@@ -119,6 +120,66 @@ int			ft_flags(t_flags *flags, const char *str)
 	return (i);
 
 }
+
+int			ft_nbrlen(int nb)
+{
+	int		i;
+
+	i = 0;
+	if (nb == 0)
+		return (1);
+	if (nb < 0)
+		nb = -nb;
+	while (nb > 0)
+	{
+		nb /= 10;
+		i++;
+	}
+	return (i);
+}
+
+int			ft_hexlen(unsigned int nb)
+{
+	int		i;
+
+	i = 0;
+	if (nb == 0)
+		return (1);
+	while (nb > 0)
+	{
+		nb /= 16;
+		i++;
+	}
+	return (i);
+}
+
+void ft_putnbr(int nb)
+{
+	unsigned int n;
+
+	n = nb < 0 ? -nb : nb;
+	if (n >= 10)
+	{
+		ft_putnbr(n / 10);
+		ft_putnbr(n % 10);
+	}
+	else
+		ft_putchar((n % 10) + '0');
+}
+
+void ft_putnbrbase(unsigned int nb, char *base)
+{
+	if (nb < 0)
+		nb = -nb;
+	if (nb >= 16)
+	{
+		ft_putnbrbase(nb / 16, base);
+		ft_putnbrbase(nb % 16, base);
+	}
+	else
+		ft_putchar(base[nb % 16]);
+}
+
 int				put_s(t_flags *flags, va_list param)
 {
 	int			i;
@@ -143,51 +204,6 @@ int				put_s(t_flags *flags, va_list param)
 	return (i + j);
 }
 
-int			ft_nbrlen(int nb, int base)
-{
-	int		i;
-
-	i = 0;
-	if (nb == 0)
-		return (1);
-	if (base == 10 && nb < 0)
-		nb = -nb;
-	while (nb > 0)
-	{
-		nb = nb / base;
-		i++;
-	}
-	return (i);
-}
-
-int			ft_hexlen(unsigned int nb, int base)
-{
-	int		i;
-
-	i = 0;
-	if (nb == 0)
-		return (1);
-	while (nb > 0)
-	{
-		nb = nb / base;
-		i++;
-	}
-	return (i);
-}
-
-void ft_putnbr(int nb)
-{
-	if (nb < 0)
-		nb = -nb;
-	if (nb >= 10)
-	{
-		ft_putnbr(nb / 10);
-		ft_putnbr(nb % 10);
-	}
-	else
-		ft_putchar((nb % 10) + '0');
-}
-
 int			put_d(t_flags *flags, va_list param)
 {
 	int		i;
@@ -198,7 +214,7 @@ int			put_d(t_flags *flags, va_list param)
 	nb = (int)va_arg(param, int);
 	if (nb < 0)
 		flags->padding--;
-	len = flags->precision > ft_nbrlen(nb, 10) ? flags->precision : ft_nbrlen(nb, 10);
+	len = flags->precision > ft_nbrlen(nb) ? flags->precision : ft_nbrlen(nb);
 	if (flags->precision == 0 && nb == 0)
 	{
 		i += ft_putnstr(' ', flags->padding);
@@ -211,23 +227,10 @@ int			put_d(t_flags *flags, va_list param)
 		ft_putchar('-');
 		i++;
 	}
-	if (flags->precision > ft_nbrlen(nb, 10))
-		i += ft_putnstr('0', flags->precision - ft_nbrlen(nb, 10));
+	if (flags->precision > ft_nbrlen(nb))
+		i += ft_putnstr('0', flags->precision - ft_nbrlen(nb));
 	ft_putnbr(nb);
-	return (i + ft_nbrlen(nb, 10));
-}
-
-void ft_putnbrbase(unsigned int nb, char *base)
-{
-	if (nb < 0)
-		nb = -nb;
-	if (nb >= 16)
-	{
-		ft_putnbrbase(nb / 16, base);
-		ft_putnbrbase(nb % 16, base);
-	}
-	else
-		ft_putchar(base[nb % 16]);
+	return (i + ft_nbrlen(nb));
 }
 
 int			put_x(t_flags *flags, va_list param)
@@ -238,7 +241,7 @@ int			put_x(t_flags *flags, va_list param)
 
 		i = 0;
 		nb = (unsigned int)va_arg(param, unsigned int);
-		len = flags->precision > ft_hexlen(nb, 16) ? flags->precision : ft_hexlen(nb, 16);
+		len = flags->precision > ft_hexlen(nb) ? flags->precision : ft_hexlen(nb);
 		if (flags->precision == 0 && nb == 0)
 		{
 			i += ft_putnstr(' ', flags->padding);
@@ -246,10 +249,10 @@ int			put_x(t_flags *flags, va_list param)
 		}
 		if (flags->padding > len)
 			i += ft_putnstr(' ', flags->padding - len);
-		if (flags->precision > ft_hexlen(nb, 16))
-			i += ft_putnstr('0', flags->precision - ft_hexlen(nb, 16));
+		if (flags->precision > ft_hexlen(nb))
+			i += ft_putnstr('0', flags->precision - ft_hexlen(nb));
 		ft_putnbrbase(nb, "0123456789abcdef");
-		return (i + ft_hexlen(nb, 16));
+		return (i + ft_hexlen(nb));
 }
 
 int			print_arg(const char *str, t_flags *flags, va_list param)

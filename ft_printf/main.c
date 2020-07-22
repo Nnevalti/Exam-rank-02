@@ -59,6 +59,19 @@ int		main(void)
 	printf("printf, ft_printf : %d, %d\n", ret, ret2);
 
 	ft_printf("padding : 1, precision : none, nb : -42\n");
+	ret = printf("-%1d-\n", -42);
+	ret2 = ft_printf("-%1d-\n", -42);
+	printf("printf, ft_printf : %d, %d\n", ret, ret2);
+
+	ft_printf("nb : int min\n");
+	ret = printf("-%d-\n", -2147483648);
+	ret2 = ft_printf("-%d-\n", -2147483648);
+	printf("printf, ft_printf : %d, %d\n", ret, ret2);
+
+	ft_printf("nb : int max\n");
+	ret = printf("-%d-\n", 2147483647);
+	ret2 = ft_printf("-%d-\n", 2147483647);
+	printf("printf, ft_printf : %d, %d\n", ret, ret2);
 
 	printf("HEX\n");
 	ft_printf("padding : 10, precision : 0, nb : 0\n");
@@ -74,6 +87,16 @@ int		main(void)
 	ft_printf("padding : 10, precision : none, nb : -42\n");
 	ret = printf("-%10x-\n", -42);
 	ret2 = ft_printf("-%10x-\n", -42);
+	printf("printf, ft_printf : %d, %d\n", ret, ret2);
+
+	ft_printf("nb : int min\n");
+	ret = printf("-%x-\n", -2147483648);
+	ret2 = ft_printf("-%x-\n", -2147483648);
+	printf("printf, ft_printf : %d, %d\n", ret, ret2);
+
+	ft_printf("nb : int max\n");
+	ret = printf("-%x-\n", 2147483647);
+	ret2 = ft_printf("-%x-\n", 2147483647);
 	printf("printf, ft_printf : %d, %d\n", ret, ret2);
 	return (0);
 }
