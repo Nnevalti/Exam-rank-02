@@ -57,10 +57,23 @@ int			ft_atoi(const char *str)
 	return (value);
 }
 
+int			ft_putnstr(char c, int len)
+{
+	int		i;
+
+	i = 0;
+	while (i < len)
+	{
+		ft_putchar(c);
+		i++;
+	}
+	return (i);
+}
+
 void	init_flags(t_flags *flags)
 {
 	flags->padding = 0;
-	flags->precision = 0;
+	flags->precision = -1;
 }
 
 int			ft_width(t_flags *flags, const char *str)
@@ -120,11 +133,7 @@ int				put_s(t_flags *flags, va_list param)
 	len = ft_strlen(str);
 	if (flags->precision >= 0 && flags->precision < len)
 		len = flags->precision;
-	while (i < flags->padding - len)
-	{
-		ft_putchar(' ');
-		i++;
-	}
+	i += ft_putnstr(' ', flags->padding - len);
 	j = 0;
 	while (j < len)
 	{
@@ -138,16 +147,45 @@ int			ft_nbrlen(int nb, int base)
 {
 	int		i;
 
+	i = 0;
 	if (nb == 0)
 		return (1);
-	else if (base == 10 && nb < 0)
+	if (base == 10 && nb < 0)
 		nb = -nb;
 	while (nb > 0)
 	{
-		nb \= base;
+		nb = nb / base;
 		i++;
 	}
 	return (i);
+}
+
+int			ft_hexlen(unsigned int nb, int base)
+{
+	int		i;
+
+	i = 0;
+	if (nb == 0)
+		return (1);
+	while (nb > 0)
+	{
+		nb = nb / base;
+		i++;
+	}
+	return (i);
+}
+
+void ft_putnbr(int nb)
+{
+	if (nb < 0)
+		nb = -nb;
+	if (nb >= 10)
+	{
+		ft_putnbr(nb / 10);
+		ft_putnbr(nb % 10);
+	}
+	else
+		ft_putchar((nb % 10) + '0');
 }
 
 int			put_d(t_flags *flags, va_list param)
@@ -156,14 +194,62 @@ int			put_d(t_flags *flags, va_list param)
 	int		nb;
 	int		len;
 
-	nb = (int)va_arg(parameters, int);
-	len = ft_nbrlen(nb, 10);
+	i = 0;
+	nb = (int)va_arg(param, int);
+	if (nb < 0)
+		flags->padding--;
+	len = flags->precision > ft_nbrlen(nb, 10) ? flags->precision : ft_nbrlen(nb, 10);
+	if (flags->precision == 0 && nb == 0)
+	{
+		i += ft_putnstr(' ', flags->padding);
+		return (i);
+	}
+	if (flags->padding > len)
+		i += ft_putnstr(' ', flags->padding - len);
+	if (nb < 0)
+	{
+		ft_putchar('-');
+		i++;
+	}
+	if (flags->precision > ft_nbrlen(nb, 10))
+		i += ft_putnstr('0', flags->precision - ft_nbrlen(nb, 10));
+	ft_putnbr(nb);
+	return (i + ft_nbrlen(nb, 10));
+}
 
+void ft_putnbrbase(unsigned int nb, char *base)
+{
+	if (nb < 0)
+		nb = -nb;
+	if (nb >= 16)
+	{
+		ft_putnbrbase(nb / 16, base);
+		ft_putnbrbase(nb % 16, base);
+	}
+	else
+		ft_putchar(base[nb % 16]);
 }
 
 int			put_x(t_flags *flags, va_list param)
 {
+		unsigned int nb;
+		int len;
+		int i;
 
+		i = 0;
+		nb = (unsigned int)va_arg(param, unsigned int);
+		len = flags->precision > ft_hexlen(nb, 16) ? flags->precision : ft_hexlen(nb, 16);
+		if (flags->precision == 0 && nb == 0)
+		{
+			i += ft_putnstr(' ', flags->padding);
+			return (i);
+		}
+		if (flags->padding > len)
+			i += ft_putnstr(' ', flags->padding - len);
+		if (flags->precision > ft_hexlen(nb, 16))
+			i += ft_putnstr('0', flags->precision - ft_hexlen(nb, 16));
+		ft_putnbrbase(nb, "0123456789abcdef");
+		return (i + ft_hexlen(nb, 16));
 }
 
 int			print_arg(const char *str, t_flags *flags, va_list param)
@@ -188,6 +274,7 @@ int			ft_printf(const char *str, ... )
 	int		pchar;
 
 	i = 0;
+	pchar = 0;
 	if (!(flags = malloc(sizeof(t_flags))))
 		return (-1);
 	va_start(param, str);
