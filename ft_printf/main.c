@@ -28,9 +28,9 @@ int		main(void)
 	printf("printf, ft_printf : %d, %d\n", ret, ret2);
 
 	printf("NBR\n");
-	ft_printf("padding : 10, precision : none, nb : 42\n");
-	ret = printf("-%10d-\n", 42);
-	ret2 = ft_printf("-%10d-\n", 42);
+	ft_printf("padding : 10, precision : 1, nb : 42\n");
+	ret = printf("-%10.1d-\n", 42);
+	ret2 = ft_printf("-%10.1d-\n", 42);
 	printf("printf, ft_printf : %d, %d\n", ret, ret2);
 
 	ft_printf("padding : 10, precision : 12, nb : -42\n");

@@ -35,12 +35,10 @@ void		ft_union(char *str1, char *str2)
 	}
 }
 
-int			main(int ac, char **av)
+int main(int ac, char **av)
 {
 	if (ac == 3)
-	{
 		ft_union(av[1], av[2]);
-	}
 	write(1, "\n", 1);
 	return (0);
 }
